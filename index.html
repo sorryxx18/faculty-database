@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>消防局師資資歷與回饋管理系統</title>
+    <title>消防師資戰力回饋與報名排序系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f1f5f9; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .nav-btn.active { background-color: #f97316; color: white; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
-        .instructor-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        .tab-content.active { display: block; }
+        .nav-btn.active { background: #f97316; color: white; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
         .modal { display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 100; backdrop-filter: blur(4px); }
         .modal.active { display: flex; }
     </style>
@@ -25,34 +23,18 @@
     <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-2xl shrink-0">
         <div class="p-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <i class="ri-shield-user-fill text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold">師資管理系統</h1>
-                    <p class="text-[10px] text-slate-400">Fire Instructor Pro</p>
-                </div>
+                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center"><i class="ri-shield-user-fill text-2xl"></i></div>
+                <div><h1 class="font-bold">師資管理系統</h1><p class="text-[10px] text-slate-400">Fire Instructor Pro</p></div>
             </div>
         </div>
-        
         <nav class="flex-1 p-4 mt-4 space-y-2">
-            <button onclick="switchTab('db')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition active" id="btn-db">
-                <i class="ri-contacts-line text-lg"></i> 教官師資庫
-            </button>
-            <button onclick="switchTab('support')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition" id="btn-support">
-                <i class="ri-history-line text-lg"></i> 支援資歷檔案
-            </button>
-            <button onclick="switchTab('schedule')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition" id="btn-schedule">
-                <i class="ri-calendar-check-line text-lg"></i> 課表審核報名
-            </button>
-            <button onclick="switchTab('import')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition" id="btn-import">
-                <i class="ri-line-chart-line text-lg"></i> 領據逆推時數
-            </button>
+            <button onclick="switchTab('db')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white transition active" id="btn-db"><i class="ri-group-line text-lg"></i> 教官師資庫</button>
+            <button onclick="switchTab('booking')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="btn-booking"><i class="ri-edit-box-line text-lg"></i> 教官自主報名</button>
+            <button onclick="switchTab('audit')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="btn-audit"><i class="ri-check-double-line text-lg"></i> 排序審核發佈</button>
+            <button onclick="switchTab('import')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="btn-import"><i class="ri-line-chart-line text-lg"></i> 領據逆推時數</button>
+            <button onclick="switchTab('support')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="btn-support"><i class="ri-history-line text-lg"></i> 支援資歷檔案</button>
         </nav>
-
-        <div class="p-4 border-t border-slate-800 text-center">
-            <div class="text-[10px] text-slate-500">當前統計系統 v3.0</div>
-        </div>
+        <div class="p-6 border-t border-slate-800 text-[10px] text-slate-500 text-center">Fire Instructor v3.5</div>
     </aside>
 
     <!-- 主內容區 -->
@@ -62,211 +44,309 @@
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
             <div id="pageTitle" class="font-bold text-slate-800 text-xl">教官師資庫</div>
             <div class="flex items-center gap-4">
-                <div class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold">115年1月週期</div>
+                <span class="text-xs text-slate-400">系統日期：115/01/06</span>
             </div>
         </header>
 
-        <!-- 頁面：教官資料庫 -->
+        <!-- 頁面：師資庫 -->
         <section id="tab-db" class="tab-content active p-8 overflow-y-auto h-full">
-            <div class="flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex gap-4 items-center">
-                    <div class="relative w-64">
-                        <i class="ri-search-line absolute left-3 top-2.5 text-slate-400"></i>
-                        <input type="text" id="dbSearch" placeholder="搜尋姓名、單位..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-orange-500">
-                    </div>
-                    <button class="text-xs text-blue-600 font-bold hover:underline" onclick="$('#fileIns').click()">批次匯入教官</button>
+                    <button class="text-xs bg-slate-100 px-3 py-2 rounded-lg font-bold text-slate-600 hover:bg-slate-200" onclick="downloadInsSample()">下載匯入範本</button>
+                    <button class="text-xs bg-blue-50 px-3 py-2 rounded-lg font-bold text-blue-600 hover:bg-blue-100" onclick="$('#fileIns').click()">批次匯入師資</button>
                     <input type="file" id="fileIns" class="hidden" accept=".csv" onchange="importIns(this)">
                 </div>
-                <button class="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-orange-500 transition flex items-center gap-2" onclick="openModal('modalAddIns')">
-                    <i class="ri-user-add-line"></i> 新增教官
-                </button>
+                <button class="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-orange-500 transition" onclick="openModal('modalAddIns')">+ 新增師資</button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="insGrid"></div>
         </section>
 
-        <!-- 頁面：支援資歷檔案 (New Tab from PDF) -->
-        <section id="tab-support" class="tab-content p-8 overflow-y-auto h-full">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h3 class="text-2xl font-bold text-slate-800">各級教官支援資歷</h3>
-                    <p class="text-slate-500 text-sm">收納戰技教官、區隊長支援期程紀錄</p>
+        <!-- 頁面：教官自主報名 -->
+        <section id="tab-booking" class="tab-content p-8 overflow-y-auto h-full text-center">
+            <div class="max-w-xl mx-auto bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
+                <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl"><i class="ri-user-follow-line"></i></div>
+                <h2 class="text-2xl font-bold mb-2">教官身分驗證</h2>
+                <p class="text-slate-400 text-sm mb-8">請輸入身分證字號以開啟報名權限</p>
+                <input type="text" id="bookingId" placeholder="請輸入身分證字號" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center text-lg font-bold mb-4 outline-none focus:border-orange-500">
+                <button onclick="loginBooking()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-orange-500 transition">進入報名大廳</button>
+                
+                <div id="bookingList" class="mt-10 text-left hidden border-t pt-8 space-y-4">
+                    <!-- 開放報名的課程 -->
                 </div>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold" onclick="$('#fileSupport').click()">匯入資歷紀錄</button>
-                <input type="file" id="fileSupport" class="hidden" accept=".csv" onchange="importSupport(this)">
-            </div>
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th class="p-4 text-xs font-bold text-slate-400">大隊/單位</th>
-                            <th class="p-4 text-xs font-bold text-slate-400">姓名</th>
-                            <th class="p-4 text-xs font-bold text-slate-400">類別/職稱</th>
-                            <th class="p-4 text-xs font-bold text-slate-400">支援期程</th>
-                            <th class="p-4 text-xs font-bold text-slate-400 text-center">總月數</th>
-                        </tr>
-                    </thead>
-                    <tbody id="supportTableBody" class="text-sm">
-                        <!-- 資料由 JS 匯入後生成 -->
-                        <tr><td colspan="5" class="p-10 text-center text-slate-300 italic">尚未匯入資歷數據...</td></tr>
-                    </tbody>
-                </table>
             </div>
         </section>
 
-        <!-- 頁面：課表審核 -->
-        <section id="tab-schedule" class="tab-content p-8 overflow-y-auto h-full">
-            <div class="max-w-5xl mx-auto">
-                <div class="flex justify-between items-end mb-6">
-                    <h3 class="text-2xl font-bold text-slate-800">訓練課表報名審核</h3>
-                    <button class="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold" onclick="$('#fileCourse').click()">匯入課表CSV</button>
+        <!-- 頁面：審核發佈 -->
+        <section id="tab-audit" class="tab-content p-8 overflow-y-auto h-full">
+            <div class="flex justify-between items-end mb-6">
+                <div><h3 class="text-2xl font-bold">課表審核發佈</h3><p class="text-slate-500 text-sm">先資歷(證照年資)、後公平(年度時數)</p></div>
+                <div class="flex gap-2">
+                    <button class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold" onclick="downloadCourseSample()">下載課表範本</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg" onclick="$('#fileCourse').click()">匯入課表CSV</button>
                     <input type="file" id="fileCourse" class="hidden" accept=".csv" onchange="importCourse(this)">
                 </div>
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden" id="courseList">
-                    <!-- 課表卡片 -->
+            </div>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden" id="auditCourseList">
+                <!-- 課程清單 -->
+            </div>
+        </section>
+
+        <!-- 頁面：時數逆推 -->
+        <section id="tab-import" class="tab-content p-8 h-full">
+            <div class="max-w-2xl mx-auto mt-10 bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden text-center p-10">
+                <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="ri-history-line"></i></div>
+                <h2 class="text-2xl font-bold mb-2">時數逆推歸戶</h2>
+                <p class="text-slate-400 text-sm mb-8">根據領據金額自動換算回饋時數</p>
+                <div class="border-2 border-dashed border-slate-100 rounded-2xl p-10 text-center hover:border-blue-500 transition cursor-pointer" onclick="$('#filePayroll').click()">
+                    <p class="text-slate-500" id="payrollName">上傳 鐘點費領據清冊.csv</p>
+                    <input type="file" id="filePayroll" class="hidden" accept=".csv" onchange="applyPayroll(this)">
                 </div>
             </div>
         </section>
 
-        <!-- 頁面：領據逆推 -->
-        <section id="tab-import" class="tab-content p-8 h-full">
-            <div class="max-w-2xl mx-auto mt-10 bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden text-center p-10">
-                <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-                    <i class="ri-exchange-box-line"></i>
-                </div>
-                <h2 class="text-2xl font-bold mb-2">官方領據時數逆推</h2>
-                <p class="text-slate-400 text-sm mb-8">上傳領據 CSV，系統自動依費率換算並累積教官回饋時數</p>
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-slate-50 p-4 rounded-2xl"><label class="block text-[10px] font-bold text-slate-400 uppercase">教官費率</label><input type="number" id="rateL" value="1000" class="bg-transparent font-bold text-center w-full outline-none"></div>
-                    <div class="bg-slate-50 p-4 rounded-2xl"><label class="block text-[10px] font-bold text-slate-400 uppercase">助教費率</label><input type="number" id="rateA" value="500" class="bg-transparent font-bold text-center w-full outline-none"></div>
-                </div>
-                <button class="w-full bg-orange-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg" onclick="$('#filePayroll').click()">選擇領據 CSV 檔案</button>
-                <input type="file" id="filePayroll" class="hidden" accept=".csv" onchange="applyPayroll(this)">
+        <!-- 頁面：支援資歷 (PDF) -->
+        <section id="tab-support" class="tab-content p-8 overflow-y-auto h-full">
+            <div class="flex justify-between items-end mb-6">
+                <div><h3 class="text-2xl font-bold">支援資歷統計</h3><p class="text-slate-500 text-sm">提供大隊年度資歷統計使用</p></div>
+                <button class="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold" onclick="$('#fileSupport').click()">匯入資歷紀錄</button>
+                <input type="file" id="fileSupport" class="hidden" accept=".csv" onchange="importSupport(this)">
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 border-b"><tr><th class="p-4">大隊</th><th class="p-4">姓名</th><th class="p-4">類別</th><th class="p-4">支援期程</th><th class="p-4 text-center">月數</th></tr></thead>
+                    <tbody id="supportTableBody"></tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <!-- MODAL: 新增教官 -->
+    <!-- Modal: 新增師資 -->
     <div id="modalAddIns" class="modal">
         <div class="bg-white w-[500px] rounded-3xl p-8 shadow-2xl">
-            <h3 class="text-xl font-bold mb-6">新增教官資料</h3>
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ri-user-add-fill text-orange-500"></i> 新增教官</h3>
             <div class="space-y-4">
                 <div class="flex justify-center mb-4">
-                    <div class="w-24 h-24 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center relative overflow-hidden group">
+                    <div class="w-24 h-24 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center relative overflow-hidden">
                         <img id="prevPhoto" class="hidden w-full h-full object-cover">
-                        <i class="ri-camera-3-line text-2xl text-slate-300"></i>
+                        <i class="ri-camera-line text-2xl text-slate-300"></i>
                         <input type="file" id="inPhoto" class="absolute inset-0 opacity-0 cursor-pointer" onchange="preImg(this)">
                     </div>
                 </div>
-                <input type="text" id="inName" placeholder="教官姓名" class="w-full p-3 bg-slate-50 rounded-xl outline-none focus:border-orange-500 border border-transparent">
-                <input type="text" id="inId" placeholder="身分證字號" class="w-full p-3 bg-slate-50 rounded-xl outline-none focus:border-orange-500 border border-transparent">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="text" id="inUnit" placeholder="單位" class="w-full p-3 bg-slate-50 rounded-xl border border-transparent">
-                    <input type="number" id="inYear" placeholder="消防年資" class="w-full p-3 bg-slate-50 rounded-xl border border-transparent">
+                    <input type="text" id="inName" placeholder="姓名" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-orange-500">
+                    <input type="text" id="inId" placeholder="身分證字號" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-orange-500">
                 </div>
-                <input type="text" id="inTags" placeholder="專長 (逗號分隔)" class="w-full p-3 bg-slate-50 rounded-xl border border-transparent">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="inUnit" placeholder="單位" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                    <input type="month" id="inCertDate" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl" title="取得師資證照年月">
+                </div>
+                <input type="text" id="inTags" placeholder="專長 (如:火搶,急流)" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="inL" placeholder="累計教官時數" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                    <input type="number" id="inA" placeholder="累計助教時數" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                </div>
             </div>
             <div class="flex gap-4 mt-8">
                 <button class="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-400" onclick="closeModal('modalAddIns')">取消</button>
-                <button class="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold" onclick="saveIns()">儲存</button>
+                <button class="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold shadow-lg" onclick="saveIns()">儲存建立</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: 排序審核 -->
+    <!-- Modal: 審核名單 -->
     <div id="modalAudit" class="modal">
         <div class="bg-white w-[600px] rounded-3xl p-8 shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">先資歷後公平 - 報名審核</h3>
-                <button onclick="closeModal('modalAudit')" class="text-slate-300"><i class="ri-close-line text-2xl"></i></button>
-            </div>
+            <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold" id="auditTitle">排序審核</h3><button onclick="closeModal('modalAudit')" class="text-slate-300"><i class="ri-close-line text-2xl"></i></button></div>
             <div class="flex-1 overflow-y-auto space-y-3" id="auditList"></div>
-            <button class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold mt-6 shadow-lg" onclick="closeModal('modalAudit')">核准並通知</button>
+            <button class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold mt-6" onclick="closeModal('modalAudit')">完成審核核准</button>
         </div>
     </div>
 
     <script>
         const $ = s => document.querySelector(s);
         let instructors = [
-            { id: "P122355534", name: "楊東閔", unit: "大直分隊", seniority: 12, leadHours: 145, asstHours: 40, currentYear: 12, tags: "救助,火搶", photo: "" },
-            { id: "A127854094", name: "張浩哲", unit: "大直分隊", seniority: 5, leadHours: 20, asstHours: 55, currentYear: 4, tags: "急流,車助", photo: "" }
+            { id: "P122355534", name: "楊東閔", unit: "大直分隊", certDate: "105-10", leadHours: 145, asstHours: 40, currentYear: 12, tags: "救護,火搶", photo: "" },
+            { id: "A127854094", name: "張浩哲", unit: "大直分隊", certDate: "110-06", leadHours: 20, asstHours: 55, currentYear: 4, tags: "急流,救助", photo: "" }
+        ];
+        let courses = [
+            { id: 1, name: "115年新進人員救助訓練", date: "115/02/10", loc: "保長坑", rateL: 1000, rateA: 500, reqL: 1, reqA: 2, applicants: [] }
         ];
         let supports = [];
-        let courses = [{ id:1, name:"115年新進人員救助訓練", date:"115/02/10", loc:"保長坑", reqL:1, reqA:2 }];
+        let currentBookingUser = null;
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             $('#tab-' + tab).classList.add('active');
             $('#btn-' + tab).classList.add('active');
-            const titles = { db: "教官師資庫", support: "支援資歷檔案", schedule: "課表審核報名", import: "領據逆推時數" };
+            const titles = { db: "教官師資庫", booking: "教官自主報名", audit: "排序審核發佈", import: "時數逆推歸戶", support: "支援資歷統計" };
             $('#pageTitle').innerText = titles[tab];
             if(tab === 'db') renderIns();
-            if(tab === 'support') renderSupport();
-            if(tab === 'schedule') renderCourse();
+            if(tab === 'audit') renderAuditCourses();
         }
 
-        // 渲染教官名片 (仿電動車系統)
+        // 渲染教官名片 (增加照片顯示)
         function renderIns() {
             const grid = $('#insGrid');
             grid.innerHTML = instructors.map(ins => {
                 const img = ins.photo ? `<img src="${ins.photo}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400 font-bold text-2xl">${ins.name[0]}</div>`;
                 return `
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 instructor-card">
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
                     <div class="flex gap-4 items-center mb-6">
                         <div class="w-16 h-16 rounded-2xl border border-slate-100 overflow-hidden shrink-0 shadow-sm">${img}</div>
                         <div>
                             <div class="text-[10px] font-bold text-orange-500">${ins.unit}</div>
                             <h3 class="text-lg font-bold text-slate-800">${ins.name}</h3>
-                            <div class="flex gap-1 mt-1">${ins.tags.split(',').map(t => `<span class="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-400 text-[8px] font-bold">${t}</span>`).join('')}</div>
+                            <div class="text-[9px] text-slate-400">證照年資起於：${ins.certDate}</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 border-t pt-4">
-                        <div class="text-center">
-                            <div class="text-xl font-bold text-blue-600">${ins.leadHours}</div>
-                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">教官時數</div>
-                        </div>
-                        <div class="text-center border-l border-slate-50">
-                            <div class="text-xl font-bold text-emerald-500">${ins.asstHours}</div>
-                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">助教時數</div>
-                        </div>
+                        <div class="text-center"><div class="text-xl font-bold text-blue-600">${ins.leadHours}</div><div class="text-[8px] text-slate-400 uppercase">累計教官</div></div>
+                        <div class="text-center border-l"><div class="text-xl font-bold text-emerald-500">${ins.asstHours}</div><div class="text-[8px] text-slate-400 uppercase">累計助教</div></div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // 渲染支援資歷 (PDF數據)
-        function renderSupport() {
-            const body = $('#supportTableBody');
-            if(supports.length === 0) return;
-            body.innerHTML = supports.map(s => `
-                <tr class="border-b border-slate-50 hover:bg-slate-50">
-                    <td class="p-4 font-bold text-slate-700">${s.bat}</td>
-                    <td class="p-4">${s.name}</td>
-                    <td class="p-4 text-xs bg-slate-100 rounded inline-block mt-2">${s.cat}</td>
-                    <td class="p-4 font-mono text-xs text-slate-400">${s.period}</td>
-                    <td class="p-4 text-center font-bold text-orange-500">${s.months}</td>
-                </tr>
-            `).join('');
+        // 報名登入
+        function loginBooking() {
+            const id = $('#bookingId').value.trim();
+            const user = instructors.find(i => i.id === id);
+            if(!user) return alert("查無此教官資料，請洽承辦人");
+            currentBookingUser = user;
+            $('#bookingList').classList.remove('hidden');
+            renderBookingCourses();
         }
 
-        // 渲染課表
-        function renderCourse() {
-            const list = $('#courseList');
-            list.innerHTML = courses.map(c => `
-                <div class="flex items-center justify-between p-6 border-b border-slate-50 hover:bg-slate-50">
-                    <div>
-                        <div class="font-bold text-slate-800">${c.name}</div>
-                        <div class="text-[10px] text-slate-400 mt-1">${c.date} | 地點：${c.loc}</div>
+        function renderBookingCourses() {
+            const list = $('#bookingList');
+            list.innerHTML = `<h3 class="font-bold mb-4">歡迎教官 ${currentBookingUser.name}，請選擇報名課程：</h3>`;
+            courses.forEach(c => {
+                list.innerHTML += `
+                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center">
+                    <div><div class="font-bold text-sm">${c.name}</div><div class="text-xs text-slate-400">${c.date} | ${c.loc}</div></div>
+                    <div class="flex gap-2">
+                        <button onclick="applyToCourse(${c.id}, '教官')" class="px-4 py-1.5 bg-blue-600 text-white text-xs rounded-lg shadow">報名教官</button>
+                        <button onclick="applyToCourse(${c.id}, '助教')" class="px-4 py-1.5 bg-emerald-600 text-white text-xs rounded-lg shadow">報名助教</button>
                     </div>
-                    <div class="flex gap-10 items-center">
-                        <div class="text-xs font-bold text-slate-500">需求：教 ${c.reqL} / 助 ${c.reqA}</div>
-                        <button onclick="openAudit()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold">排序審核</button>
+                </div>`;
+            });
+        }
+
+        function applyToCourse(courseId, role) {
+            const course = courses.find(c => c.id === courseId);
+            if(course.applicants.find(a => a.id === currentBookingUser.id)) return alert("您已報名過此課程");
+            course.applicants.push({ id: currentBookingUser.id, role: role });
+            alert(`報名成功！您已報名擔任「${role}」，請靜候審核。`);
+        }
+
+        // 審核頁面
+        function renderAuditCourses() {
+            const list = $('#auditCourseList');
+            list.innerHTML = courses.map(c => `
+                <div class="flex items-center justify-between p-6 border-b hover:bg-slate-50">
+                    <div><div class="font-bold text-slate-800">${c.name}</div><div class="text-xs text-slate-400">${c.date} | 教:${c.reqL} 助:${c.reqA}</div></div>
+                    <div class="flex gap-6 items-center">
+                        <div class="text-xs font-bold text-orange-500">${c.applicants.length} 人報名</div>
+                        <button onclick="openAudit(${c.id})" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-lg">進入排序審核</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 照片預覽
+        function openAudit(courseId) {
+            const course = courses.find(c => c.id === courseId);
+            $('#auditTitle').innerText = `【${course.name}】排序審核`;
+            const list = $('#auditList');
+            openModal('modalAudit');
+
+            // 排序邏輯：先資歷(certDate 小者在前) -> 後公平(currentYear 小者在前)
+            const sortedApplicants = course.applicants.map(a => {
+                const ins = instructors.find(i => i.id === a.id);
+                return { ...ins, role: a.role };
+            }).sort((a, b) => {
+                if(a.certDate !== b.certDate) return a.certDate > b.certDate ? 1 : -1;
+                return a.currentYear - b.currentYear;
+            });
+
+            if(sortedApplicants.length === 0) { list.innerHTML = `<div class="p-10 text-center text-slate-300">目前尚無教官報名...</div>`; return; }
+
+            list.innerHTML = sortedApplicants.map((ins, i) => `
+                <div class="flex items-center justify-between p-4 rounded-2xl border ${i===0 ? 'border-orange-200 bg-orange-50' : 'bg-white shadow-sm'}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full ${i===0?'bg-orange-500 text-white':'bg-slate-100 text-slate-400'} flex items-center justify-center font-bold text-xs">${i+1}</div>
+                        <div><div class="font-bold text-sm">${ins.name} <span class="text-[10px] bg-slate-900 text-white px-1.5 rounded">${ins.role}</span></div>
+                        <div class="text-[9px] font-bold text-slate-400 mt-1 uppercase">證照起：${ins.certDate} | 今年領：${ins.currentYear}hr</div></div>
+                    </div>
+                    <button class="bg-white border border-slate-200 text-[10px] font-bold px-4 py-1.5 rounded-lg hover:bg-orange-500 hover:text-white">核准錄取</button>
+                </div>
+            `).join('');
+        }
+
+        // 下載範本功能
+        function downloadInsSample() {
+            const csv = "\uFEFF身分證字號,姓名,服務單位,取得師資證照年月(範例110-06),專長標籤,累計教官時數,累計助教時數\nP123456789,林教官,大直分隊,110-06,火搶,50,20";
+            saveAs(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "教官匯入範本.csv");
+        }
+        function downloadCourseSample() {
+            const csv = "\uFEFF日期,課程名稱,地點,教官費率,助教費率,需求教官,需求助教\n115/02/10,救助訓練,保長坑,1000,500,1,2";
+            saveAs(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), "課表匯入範本.csv");
+        }
+
+        // CSV 匯入邏輯
+        function importIns(input) {
+            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
+                instructors = res.data.map(r => ({
+                    id: r["身分證字號"], name: r["姓名"], unit: r["服務單位"], certDate: r["取得師資證照年月(範例110-06)"],
+                    tags: r["專長標籤"], leadHours: parseInt(r["累計教官時數"])||0, asstHours: parseInt(r["累計助教時數"])||0, currentYear: 0, photo: ""
+                }));
+                renderIns(); alert("師資母檔更新完成");
+            }});
+        }
+
+        function importCourse(input) {
+            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
+                res.data.forEach(r => {
+                    courses.push({
+                        id: Date.now() + Math.random(), date: r["日期"], name: r["課程名稱"], loc: r["地點"],
+                        rateL: parseInt(r["教官費率"]), rateA: parseInt(r["助教費率"]),
+                        reqL: parseInt(r["需求教官"]), reqA: parseInt(r["需求助教"]), applicants: []
+                    });
+                });
+                renderAuditCourses(); alert("課表發佈完成");
+            }});
+        }
+
+        function importSupport(input) {
+            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
+                supports = res.data.map(r => ({ bat: r["大隊別"], name: r["姓名"], cat: r["類別"], period: r["姓名與時間"], months: r["支援期程(月)"] }));
+                renderSupport(); alert("支援資歷匯入完成");
+            }});
+        }
+
+        function renderSupport() {
+            const body = $('#supportTableBody');
+            body.innerHTML = supports.map(s => `<tr><td class="p-4">${s.bat}</td><td class="p-4 font-bold">${s.name}</td><td class="p-4">${s.cat}</td><td class="p-4 text-xs font-mono">${s.period}</td><td class="p-4 text-center text-orange-600 font-bold">${s.months}</td></tr>`).join('');
+        }
+
+        function applyPayroll(input) {
+            $('#payrollName').innerText = input.files[0].name;
+            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
+                res.data.forEach(row => {
+                    const ins = instructors.find(i => i.id === row["身分證字號"]);
+                    if(ins) {
+                        const amt = parseFloat(row["鐘點費(A)"]);
+                        // 這裡可以根據金額逆推，假設預設 1000/500
+                        if(amt % 1000 === 0) { ins.leadHours += amt/1000; ins.currentYear += amt/1000; }
+                        else { ins.asstHours += amt/500; ins.currentYear += amt/500; }
+                    }
+                });
+                alert("回饋時數已逆推歸戶完成");
+                renderIns();
+            }});
+        }
+
+        // 其他工具
         function preImg(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -274,88 +354,17 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        // 儲存教官 (修正點)
         function saveIns() {
-            const name = $('#inName').value;
-            const id = $('#inId').value;
-            if(!name || !id) return alert("姓名與ID必填");
             instructors.push({
-                id: id, name: name, unit: $('#inUnit').value, seniority: $('#inYear').value,
-                leadHours: 0, asstHours: 0, currentYear: 0, tags: $('#inTags').value,
-                photo: $('#prevPhoto').src.startsWith('data') ? $('#prevPhoto').src : ""
+                id: $('#inId').value, name: $('#inName').value, unit: $('#inUnit').value, certDate: $('#inCertDate').value,
+                tags: $('#inTags').value, leadHours: parseInt($('#inL').value)||0, asstHours: parseInt($('#inA').value)||0,
+                currentYear: 0, photo: $('#prevPhoto').src.startsWith('data') ? $('#prevPhoto').src : ""
             });
             renderIns(); closeModal('modalAddIns');
         }
-
-        // 匯入教官 CSV
-        function importIns(input) {
-            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
-                res.data.forEach(r => {
-                    instructors.push({
-                        id: r["身分證字號"], name: r["姓名"], unit: r["單位"], seniority: r["消防年資"],
-                        leadHours: 0, asstHours: 0, currentYear: 0, tags: r["專長"] || "教官", photo: ""
-                    });
-                });
-                renderIns(); alert("匯入教官完成");
-            }});
-        }
-
-        // 匯入支援資歷 CSV (PDF轉換後的格式)
-        function importSupport(input) {
-            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
-                supports = res.data.map(r => ({
-                    bat: r["大隊別"], name: r["姓名"], cat: r["類別"], period: r["姓名與時間"], months: r["支援期程(月)"]
-                }));
-                renderSupport(); alert("資歷檔案更新完成");
-            }});
-        }
-
-        // 領據逆推
-        function applyPayroll(input) {
-            const rL = parseFloat($('#rateL').value);
-            const rA = parseFloat($('#rateA').value);
-            Papa.parse(input.files[0], { header:true, skipEmptyLines:true, complete: res => {
-                let count = 0;
-                res.data.forEach(row => {
-                    const ins = instructors.find(i => i.id === row["身分證字號"]);
-                    if(ins) {
-                        const amt = parseFloat(row["鐘點費(A)"]);
-                        let h = (amt % rL === 0) ? amt/rL : amt/rA;
-                        if(amt % rL === 0) ins.leadHours += h; else ins.asstHours += h;
-                        ins.currentYear += h; count++;
-                    }
-                });
-                alert(`逆推完成，已更新 ${count} 位教官時數`);
-                switchTab('db');
-            }});
-        }
-
-        // 先資歷後公平排序核准
-        function openAudit() {
-            openModal('modalAudit');
-            const list = $('#auditList');
-            // 排序邏輯：資歷(leadHours)大 -> 公平(currentYear)小
-            const sorted = [...instructors].sort((a,b) => (b.leadHours - a.leadHours) || (a.currentYear - b.currentYear));
-            list.innerHTML = sorted.map((ins, i) => `
-                <div class="flex items-center justify-between p-4 rounded-2xl border ${i===0 ? 'border-orange-200 bg-orange-50' : 'border-slate-100 bg-white'} shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full ${i===0 ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-400'} flex items-center justify-center font-bold text-xs">${i+1}</div>
-                        <div>
-                            <div class="font-bold text-slate-800 text-sm">${ins.name} <span class="text-[10px] text-slate-400 font-normal ml-2">${ins.unit}</span></div>
-                            <div class="text-[9px] font-bold text-blue-600 mt-1 uppercase">資歷：${ins.leadHours}hr | 公平：${ins.currentYear}hr</div>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="bg-white border border-slate-200 text-[10px] font-bold px-3 py-1 rounded-lg hover:bg-blue-50">核准教官</button>
-                        <button class="bg-white border border-slate-200 text-[10px] font-bold px-3 py-1 rounded-lg hover:bg-emerald-50">核准助教</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function openModal(id) { $('#'+id).classList.add('active'); }
         function closeModal(id) { $('#'+id).classList.remove('active'); }
+        function saveAs(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); }
 
         renderIns();
     </script>
